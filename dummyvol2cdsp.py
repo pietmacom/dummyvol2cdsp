@@ -72,16 +72,16 @@ def cdsp_set_volume(dbvol):
     elif cdsp.get_mute():
         cdsp.set_mute(False)
         
-def sync_volume():                                                                                                                                                                                                                                                                        
+def sync_volume():         
    # assume that channel volume is equal                                                                                                                                                                                                                                                  
    alsavol = mixer.getvolume()[0]                                                                                                                                                                                                                                                         
    cubicvol = lin_vol_curve(alsavol, VOL_RANGE)
-#   cubicvol = map_cubic_volume(alsavol)                                                                                                                                                                                                                                                   
-   print('alsa=%d%% cubic=%.1f dB' % \                                                                                                                                                                                                                                                    
-       (alsavol, cubicvol))                                                                                                                                                                                                                                                               
+#   cubicvol = map_cubic_volume(alsavol)
+   print('alsa=%d%% cubic=%.1f dB' % \
+       (alsavol, cubicvol))
 
-    while True:                                                                                                                                                                                                                                                                            
-       try:                                                                                                                                                                                                                                                                               
+    while True:             
+       try:                
            cdsp_set_volume(cubicvol)                                                                                                                                                                                                                                                      
            print (cubicvol)
            _volume_state_file = Path('/var/lib/cdsp/camilladsp_volume_state1')
@@ -91,10 +91,10 @@ def sync_volume():
                 print('Couldn\'t create state file "%s", prob basedir doesn\'t exists.', _volume_state_file)
             except PermissionError as e:
                 print('Couldn\'t write state to "%s", prob incorrect owner rights of dir.', _volume_state_file)
-           break                                                                                                                                                                                                                                                                          
+           break           
        except Exception as err:                                                                                                                                                                                                                                                           
            print('setting cdsp volume failed: {0}'.format(err))                                                                                                                                                                                                                           
-           time.sleep(0.5)                                                                                                                                                                                                                                                                
+           time.sleep(0.5) 
 #           pass   
 
 if __name__ == '__main__':

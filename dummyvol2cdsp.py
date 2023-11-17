@@ -79,7 +79,7 @@ def sync_volume():
 #   cubicvol = map_cubic_volume(alsavol)
    print('alsa=%d%% cubic=%.1f dB' % \
        (alsavol, cubicvol))
-
+   
    while True:             
        try:                
            cdsp_set_volume(cubicvol)                                                                                                                                                                                                                                                      
@@ -87,9 +87,9 @@ def sync_volume():
            _volume_state_file = Path('/var/lib/cdsp/camilladsp_volume_state1')
            try:
                 _volume_state_file.write_text('{} {}'.format(cubicvol, '0'))
-            except FileNotFoundError as e:
+           except FileNotFoundError as e:
                 print('Couldn\'t create state file "%s", prob basedir doesn\'t exists.', _volume_state_file)
-            except PermissionError as e:
+           except PermissionError as e:
                 print('Couldn\'t write state to "%s", prob incorrect owner rights of dir.', _volume_state_file)
            break           
        except Exception as err:                                                                                                                                                                                                                                                           

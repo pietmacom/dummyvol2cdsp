@@ -23,16 +23,38 @@ DUMMY_DEV = 'hw:Dummy'
 # Alsa dummy mixer control name
 DUMMY_CTL = 'Master'
 ##############################################################################
+import select
+import time
 
 from alsaaudio import Mixer
 from camilladsp import CamillaConnection
-
-import select
+from math import log10, exp, log
+from pathlib import Path
 
 mixer = Mixer(device=DUMMY_DEV, control=DUMMY_CTL)
 cdsp = CamillaConnection(CDSP_HOST, CDSP_PORT)
 
 MIN_NORM = pow(10, (-1.0 * VOL_RANGE / 60.0))
+
+def lin_vol_curve(perc: int, dynamic_range: float= 60.0) -> float:
+    '''
+    Generates from a percentage a dBA, based on a curve with a dynamic_range.
+    Curve calculations coming from: https://www.dr-lex.be/info-stuff/volumecontrols.html
+
+    @perc (int) : linair value between 0-100
+    @dynamic_range (float) : dynamic range of the curve
+    return (float): Value in dBA
+    '''
+    x = perc/100.0
+    y = pow(10, dynamic_range/20)
+    a = 1/y
+    b = log(y)
+    y=a*exp(b*(x))
+    if x < .1:
+        y = x*10*a*exp(0.1*b)
+    if y == 0:
+        y = 0.000001
+    return 20* log10(y)
 
 def map_cubic_volume(alsavol):
     pct = float(alsavol)/100.0
@@ -50,17 +72,30 @@ def cdsp_set_volume(dbvol):
     elif cdsp.get_mute():
         cdsp.set_mute(False)
         
-def sync_volume():
-   # assume that channel volume is equal
-   alsavol = mixer.getvolume()[0]
-   cubicvol = map_cubic_volume(alsavol)
-   print('alsa=%d%% cubic=%.1f dB' % \
-       (alsavol, cubicvol))
-   try:
-       cdsp_set_volume(cubicvol)
-   except Exception as err:
-       print('setting cdsp volume failed: {0}'.format(err))
-       pass
+def sync_volume():                                                                                                                                                                                                                                                                        
+   # assume that channel volume is equal                                                                                                                                                                                                                                                  
+   alsavol = mixer.getvolume()[0]                                                                                                                                                                                                                                                         
+   cubicvol = lin_vol_curve(alsavol, VOL_RANGE)
+#   cubicvol = map_cubic_volume(alsavol)                                                                                                                                                                                                                                                   
+   print('alsa=%d%% cubic=%.1f dB' % \                                                                                                                                                                                                                                                    
+       (alsavol, cubicvol))                                                                                                                                                                                                                                                               
+
+    while True:                                                                                                                                                                                                                                                                            
+       try:                                                                                                                                                                                                                                                                               
+           cdsp_set_volume(cubicvol)                                                                                                                                                                                                                                                      
+           print (cubicvol)
+           _volume_state_file = Path('/var/lib/cdsp/camilladsp_volume_state1')
+           try:
+                _volume_state_file.write_text('{} {}'.format(cubicvol, '0'))
+            except FileNotFoundError as e:
+                print('Couldn\'t create state file "%s", prob basedir doesn\'t exists.', self._volume_state_file)
+            except PermissionError as e:
+                print('Couldn\'t write state to "%s", prob incorrect owner rights of dir.', self._volume_state_file)
+           break                                                                                                                                                                                                                                                                          
+       except Exception as err:                                                                                                                                                                                                                                                           
+           print('setting cdsp volume failed: {0}'.format(err))                                                                                                                                                                                                                           
+           time.sleep(0.5)                                                                                                                                                                                                                                                                
+#           pass   
 
 if __name__ == '__main__':
     # synchronize on initial startup

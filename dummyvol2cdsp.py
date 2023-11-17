@@ -88,9 +88,9 @@ def sync_volume():
            try:
                 _volume_state_file.write_text('{} {}'.format(cubicvol, '0'))
             except FileNotFoundError as e:
-                print('Couldn\'t create state file "%s", prob basedir doesn\'t exists.', self._volume_state_file)
+                print('Couldn\'t create state file "%s", prob basedir doesn\'t exists.', _volume_state_file)
             except PermissionError as e:
-                print('Couldn\'t write state to "%s", prob incorrect owner rights of dir.', self._volume_state_file)
+                print('Couldn\'t write state to "%s", prob incorrect owner rights of dir.', _volume_state_file)
            break                                                                                                                                                                                                                                                                          
        except Exception as err:                                                                                                                                                                                                                                                           
            print('setting cdsp volume failed: {0}'.format(err))                                                                                                                                                                                                                           

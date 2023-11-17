@@ -93,9 +93,9 @@ def sync_volume():
                 print('Couldn\'t create state file "%s", prob basedir doesn\'t exists.', _volume_state_file)
            except PermissionError as e:
                 print('Couldn\'t write state to "%s", prob incorrect owner rights of dir.', _volume_state_file)
-
+           pass
 #           time.sleep(0.5) 
-#           pass   
+
 
 if __name__ == '__main__':
     # synchronize on initial startup

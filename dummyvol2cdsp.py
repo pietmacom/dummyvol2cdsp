@@ -81,19 +81,19 @@ def sync_volume():
        (alsavol, cubicvol))
    
 #   while True:             
-       try:                
-           cdsp_set_volume(cubicvol)                                                                                                                                                                                                                                                      
+   try:                
+       cdsp_set_volume(cubicvol)                                                                                                                                                                                                                                                      
 #           break
-       except Exception as err:                                                                                                                                                                                                                                                           
-           print('setting cdsp volume failed: {0}'.format(err))                                                                                                                                                                                                                           
-           _volume_state_file = Path('/var/lib/cdsp/camilladsp_volume_state')
-           try:
-                _volume_state_file.write_text('{} {}'.format(cubicvol, '0'))
-           except FileNotFoundError as e:
-                print('Couldn\'t create state file "%s", prob basedir doesn\'t exists.', _volume_state_file)
-           except PermissionError as e:
-                print('Couldn\'t write state to "%s", prob incorrect owner rights of dir.', _volume_state_file)
-           pass
+   except Exception as err:                                                                                                                                                                                                                                                           
+       print('setting cdsp volume failed: {0}'.format(err))                                                                                                                                                                                                                           
+       _volume_state_file = Path('/var/lib/cdsp/camilladsp_volume_state')
+       try:
+            _volume_state_file.write_text('{} {}'.format(cubicvol, '0'))
+       except FileNotFoundError as e:
+            print('Couldn\'t create state file "%s", prob basedir doesn\'t exists.', _volume_state_file)
+       except PermissionError as e:
+            print('Couldn\'t write state to "%s", prob incorrect owner rights of dir.', _volume_state_file)
+       pass
 #           time.sleep(0.5) 
 
 

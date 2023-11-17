@@ -80,7 +80,7 @@ def sync_volume():
    print('alsa=%d%% cubic=%.1f dB' % \
        (alsavol, cubicvol))
 
-    while True:             
+   while True:             
        try:                
            cdsp_set_volume(cubicvol)                                                                                                                                                                                                                                                      
            print (cubicvol)

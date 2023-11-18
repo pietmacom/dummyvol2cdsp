@@ -70,8 +70,10 @@ def sync_volume():
    alsavol = mixer.getvolume()[0]                                                                                                                                                                                                                                                         
    dbvol = lin_vol_curve(alsavol, VOL_RANGE)
    mute = 1 if abs(dbvol) >= VOL_RANGE else 0   
+   store_volume(dbvol, mute)
+
    print('alsa=%d%% dbvol=%.1f dB mute=%s' % (alsavol, dbvol, mute))
- 
+
    try:                
        if not cdsp.is_connected():
            cdsp.connect()
@@ -81,12 +83,9 @@ def sync_volume():
            cdsp.set_mute(True)
        elif cdsp.get_mute():
            cdsp.set_mute(False)
-           
-       store_volume(dbvol, mute)
 
    except Exception as err:                                                                                                                                                                                                                                                           
        print('setting cdsp volume failed: {0}'.format(err))
-       store_volume(dbvol, mute)
        pass
 
 if __name__ == '__main__':

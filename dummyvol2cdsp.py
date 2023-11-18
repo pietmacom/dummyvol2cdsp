@@ -56,50 +56,40 @@ def lin_vol_curve(perc: int, dynamic_range: float= 60.0) -> float:
         y = 0.000001
     return 20* log10(y)
 
-def map_cubic_volume(alsavol):
-    pct = float(alsavol)/100.0
-    cubic_vol = pow(pct * (1.0 - MIN_NORM) + MIN_NORM, 3) * VOL_RANGE - VOL_RANGE
-    return cubic_vol
-
-def cdsp_set_volume(dbvol):
-    if not cdsp.is_connected():
-        cdsp.connect()
-        
-    cdsp.set_volume(dbvol)
-    
-    if abs(dbvol) >= VOL_RANGE:
-        cdsp.set_mute(True)
-    elif cdsp.get_mute():
-        cdsp.set_mute(False)
-
-def store_volume(volume_db: float):
+def store_volume(volume_db: float, mute: int=0):
    _volume_state_file = Path('/var/lib/cdsp/camilladsp_volume_state')
    try:
-        _volume_state_file.write_text('{} {}'.format(volume_db, '0'))
+        _volume_state_file.write_text('{} {}'.format(volume_db, mute))
    except FileNotFoundError as e:
         print('Couldn\'t create state file "%s", prob basedir doesn\'t exists.', _volume_state_file)
         pass
    except PermissionError as e:
         print('Couldn\'t write state to "%s", prob incorrect owner rights of dir.', _volume_state_file)
         pass
-
     
 def sync_volume():         
    # assume that channel volume is equal                                                                                                                                                                                                                                                  
    alsavol = mixer.getvolume()[0]                                                                                                                                                                                                                                                         
-   cubicvol = lin_vol_curve(alsavol, VOL_RANGE)
-#   cubicvol = map_cubic_volume(alsavol)
-   print('alsa=%d%% cubic=%.1f dB' % \
-       (alsavol, cubicvol))
-    
+   dbvol = lin_vol_curve(alsavol, VOL_RANGE)
+   mute = 1 if abs(dbvol) >= VOL_RANGE else 0   
+   print('alsa=%d%% dbvol=%.1f dB mute=%s' % (alsavol, dbvol, mute))
+ 
    try:                
-       cdsp_set_volume(cubicvol)                                                                                                                                                                                                                                                      
-       store_volume(cubicvol)
+       if not cdsp.is_connected():
+           cdsp.connect()
+            
+       cdsp.set_volume(dbvol)        
+       if mute == 1 and not cdsp.get_mute() &&  :
+           cdsp.set_mute(True)
+       elif cdsp.get_mute():
+           cdsp.set_mute(False)
+           
+       store_volume(dbvol, mute)
+
    except Exception as err:                                                                                                                                                                                                                                                           
        print('setting cdsp volume failed: {0}'.format(err))
-       store_volume(cubicvol)
+       store_volume(dbvol, mute)
        pass
-
 
 if __name__ == '__main__':
     # synchronize on initial startup

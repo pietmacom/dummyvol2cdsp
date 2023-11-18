@@ -79,7 +79,7 @@ def sync_volume():
            cdsp.connect()
             
        cdsp.set_volume(dbvol)        
-       if mute == 1 and not cdsp.get_mute() &&  :
+       if mute == 1 and not cdsp.get_mute():
            cdsp.set_mute(True)
        elif cdsp.get_mute():
            cdsp.set_mute(False)

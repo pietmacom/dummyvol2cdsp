@@ -1,4 +1,4 @@
-# New/Added
+# Modifications
 
 * Generates from a percentage a dBA, based on a curve with a dynamic_range. Curve calculations coming from: https://www.dr-lex.be/info-stuff/volumecontrols.html
 * Make cdsp usethe last setting and save volume and mute state in /var/lib/cdsp/camilladsp_volume_state

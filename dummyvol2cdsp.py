@@ -34,8 +34,6 @@ from pathlib import Path
 mixer = Mixer(device=DUMMY_DEV, control=DUMMY_CTL)
 cdsp = CamillaConnection(CDSP_HOST, CDSP_PORT)
 
-MIN_NORM = pow(10, (-1.0 * VOL_RANGE / 60.0))
-
 def lin_vol_curve(perc: int, dynamic_range: float= 60.0) -> float:
     '''
     Generates from a percentage a dBA, based on a curve with a dynamic_range.
